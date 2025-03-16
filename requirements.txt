@@ -1,0 +1,7 @@
+certifi>=2024.7.4
+requests==2.31.0
+urllib3==2.2.1
+tokenizers==0.21.0
+transformers>=4.48.1
+llama-parse>=0.1.16
+nest-asyncio
