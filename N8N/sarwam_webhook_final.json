@@ -1,0 +1,1090 @@
+{
+  "name": "sarwam_webhook final copy",
+  "nodes": [
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "target_language_code",
+              "value": "={{ $json.output.LanguageDetected }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Target Language Selection1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -680,
+        100
+      ],
+      "id": "b6f9a48f-95b9-4e86-80ba-09cee399d8d2"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "source_language_code",
+              "value": "kn-IN"
+            },
+            {
+              "name": "detected_language",
+              "value": "Kannada"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set Kannada Source",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        80,
+        300
+      ],
+      "id": "83cc2707-e025-4ff9-9f6c-00a1613847a1"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "source_language_code",
+              "value": "en-IN"
+            },
+            {
+              "name": "detected_language",
+              "value": "={{ $json.target_language_code }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set English Source",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        80,
+        0
+      ],
+      "id": "5a7c0353-b2e8-4f41-a5ac-85db40a1e058"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "=detected_language",
+              "value": "Hindi"
+            },
+            {
+              "name": "source_language_code",
+              "value": "hi-IN"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set Hindi Source",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        80,
+        -140
+      ],
+      "id": "50e6760a-268a-4915-8835-68149f0b6cef"
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.output.LanguageDetected }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "hi-IN"
+            },
+            {
+              "value2": "en-IN",
+              "output": 1
+            },
+            {
+              "value2": "kn-IN",
+              "output": 3
+            },
+            {
+              "value2": "te-IN",
+              "output": 2
+            }
+          ]
+        }
+      },
+      "name": "Source Language Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        -360,
+        80
+      ],
+      "id": "bce4ec0d-94a7-4442-bf53-fd6e8805f3b1"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "input_text",
+              "value": "={{ $json.text }}"
+            },
+            {
+              "name": "ChatID",
+              "value": "={{ $json.message.chat.id }}"
+            },
+            {
+              "name": "chatID",
+              "value": "={{ $json.message.chat.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Process Input",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -1400,
+        260
+      ],
+      "id": "2ed4d908-a681-4f2a-a0ce-d1a5c7a4c64a"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=```\nYou are an advanced language detection system. Your task is to accurately determine the language of a given text input, even when the input is written using English alphabet characters but represents words from different languages. You should focus on identifying the language based on the phonetic and word patterns, not just character sets. You are optimized to detect the following languages: English, Hindi, Kannada, and Punjabi.\n\n**Instructions:**\n\n1.  **Receive Text Input:** I will provide you with a text string, which will be written using English alphabet characters.\n2.  **Analyze Phonetic and Word Patterns:** Carefully analyze the provided text, considering phonetic patterns, common word structures, and common phrases in the specified languages.\n3.  **Identify Language:** Determine the most likely language of the text from the following options:\n    * English\n    * Hindi\n    * Kannada\n    * Punjabi\n4.  **Provide Language Output:** Return a JSON object containing the original `ChatInput` and the `LanguageDetected`. The `LanguageDetected` value must be one of the specified languages. Do not include any additional explanations or formatting.\n5.  **Handle Uncertain Cases:** If you are uncertain about the language, provide your best guess. If the language is something other than the four specified languages, default to English.\n\n**Example Input:**\n\n\"what\"\n\n**Example Output:**\n\n```json\n{\n  \"ChatInput\": \"what\",\n  \"LanguageDetected\": \"en-IN\"\n\n}\n```\n\n**Example Input:**\n\n\"kya\"\n\n**Example Output:**\n\n```json\n{\n  \"ChatInput\": \"kya\",\n  \"LanguageDetected\": \"hi-IN\"\n\n}\n```\n\n**Example Input:**\n\n\"yenu\"\n\n**Example Output:**\n\n```json\n{\n  \"ChatInput\": \"yenu\",\n  \"LanguageDetected\": \"kn-IN\n\n}\n```\n\n**Example Input:**\n\n\"ke\"\n\n**Example Output:**\n\n```json\n{\n  \"ChatInput\": \"ke\",\n  \"LanguageDetected\": \"pa-IN\"\n\n}\n```\n\n**Example Input:**\n\n\"bonjour\"\n\n**Example Output:**\n\n```json\n{\n  \"ChatInput\": \"bonjour\",\n  \"LanguageDetected\": \"English\"\n\n}\n```\n\n**Constraints:**\n\n* Focus solely on language detection.\n* Do not generate any conversational responses or engage in dialogue.\n* Adhere strictly to the specified output format (JSON).\n* Return only the JSON object with `ChatInput` and `LanguageDetected` keys.\n* If the language is not one of the four specified languages, return English as the `LanguageDetected` value.\n* The input will always be written in English alphabet characters, even when representing words from other languages.\n```\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        -1020,
+        260
+      ],
+      "id": "07eaa61d-5a27-4d15-81fb-91f2f1db2f4d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -1100,
+        500
+      ],
+      "id": "5a443cda-c45c-4a56-8d2b-353d006afd86",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "px5uXY2tok7FNrLO",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"ChatInput\": \"what\",\n  \"LanguageDetected\": \"English\"\n}\n\n\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -840,
+        500
+      ],
+      "id": "382cb8c4-270f-4d50-8ce6-9f5c922f16fd",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "112ddceb-7708-4ccf-b2c4-d850231ebc56",
+              "leftValue": "={{ $json.source_language_code }}",
+              "rightValue": "=hi-IN",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "f3b7946b-e54c-4317-b6fd-4a8f1c857dab",
+              "leftValue": "={{ $json.source_language_code }}",
+              "rightValue": "pa-IN",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "a2030188-b9d3-46f0-ab98-7954d3fe0415",
+              "leftValue": "={{ $json.source_language_code }}",
+              "rightValue": "kn-IN",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        380,
+        120
+      ],
+      "id": "35d57e13-31cb-4f11-98e8-15a669873821",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.sarvam.ai/translate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "api-subscription-key",
+              "value": "ba465cb7-f096-4a58-9218-93c5ca6b0006"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "input",
+              "value": "={{ $json.output.ChatInput }}"
+            },
+            {
+              "name": "source_language_code",
+              "value": "={{ $json.source_language_code }}"
+            },
+            {
+              "name": "target_language_code",
+              "value": "=en-IN"
+            },
+            {
+              "name": "speaker_gender",
+              "value": "Female"
+            },
+            {
+              "name": "mode",
+              "value": "formal"
+            },
+            {
+              "name": "model",
+              "value": "mayura:v1"
+            },
+            {
+              "name": "enable_preprocessing",
+              "value": false
+            },
+            {
+              "name": "output_script",
+              "value": "roman"
+            },
+            {
+              "name": "numerals_format",
+              "value": "international"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Sarvam Translation API1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        560,
+        -80
+      ],
+      "id": "940644cc-3943-4fc9-803b-4c9596a1ed3f"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "original_text",
+              "value": "={{ $json.output.ChatInput }}"
+            },
+            {
+              "name": "translated_text",
+              "value": "={{ $json.translated_text }}"
+            },
+            {
+              "name": "source_language",
+              "value": "={{ $json.detected_language }}"
+            },
+            {
+              "name": "target_language",
+              "value": "={{ $json.target_language_code }}"
+            }
+          ],
+          "number": [
+            {
+              "name": "ID",
+              "value": "={{ $('Process Input').item.json.message.chat.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Format Output1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        780,
+        100
+      ],
+      "id": "72ba3466-7da1-4bcc-8f15-db3016a46c38"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "source_language_code",
+              "value": "te-IN"
+            },
+            {
+              "name": "detected_language",
+              "value": "Telugu"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set Telugu Source",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        80,
+        160
+      ],
+      "id": "b60a88ee-ed5b-4261-979d-31301ef4fe2d"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "31c62aff-11d6-4909-9803-9a4574da9fb3",
+              "name": "text",
+              "value": "={{ $json.body.text }}",
+              "type": "string"
+            },
+            {
+              "id": "8e3a23c4-7bbd-416b-b9af-327ba537cdcd",
+              "name": "message.chat.id",
+              "value": "={{ $json.headers['x-forwarded-server'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1640,
+        260
+      ],
+      "id": "87a0c30f-1e29-44af-85d5-08eb0aab6a12",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "number": [
+            {
+              "name": "ID",
+              "value": "={{ $('Process Input').item.json.message.chat.id }}"
+            },
+            {}
+          ],
+          "string": [
+            {
+              "name": "status_code",
+              "value": "=200"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "name": "Format Output2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        -120
+      ],
+      "id": "0605c950-6c9d-4530-86d8-33dcbb589a65"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "voice",
+              "value": "={{ $json.message.voice }}"
+            },
+            {
+              "name": "ChatID",
+              "value": "={{ $json.message.chat.id }}"
+            },
+            {
+              "name": "inputText",
+              "value": "={{ $json.message.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Process Input1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -1920,
+        260
+      ],
+      "id": "61dda284-cb73-4dd4-9bf4-6ae057209f0a"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.sarvam.ai/translate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "api-subscription-key",
+              "value": "ba465cb7-f096-4a58-9218-93c5ca6b0006"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "input",
+              "value": "={{ $('AI Agent1').item.json.output }}"
+            },
+            {
+              "name": "source_language_code",
+              "value": "=en-IN"
+            },
+            {
+              "name": "target_language_code",
+              "value": "={{ $('If1').item.json.output.LanguageDetected }}"
+            },
+            {
+              "name": "speaker_gender",
+              "value": "Female"
+            },
+            {
+              "name": "mode",
+              "value": "formal"
+            },
+            {
+              "name": "model",
+              "value": "mayura:v1"
+            },
+            {
+              "name": "enable_preprocessing",
+              "value": false
+            },
+            {
+              "name": "output_script",
+              "value": "roman"
+            },
+            {
+              "name": "numerals_format",
+              "value": "international"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "name": "Sarvam Translation API2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        2380,
+        20
+      ],
+      "id": "f4d6dfc8-4e54-4cac-9321-2a77188fb174"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.0-flash-exp:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        240
+      ],
+      "id": "7b408819-0902-46e7-a2d5-c1f7901b2357",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "LhYYpuSZFHSRynLp",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        1620,
+        420
+      ],
+      "id": "ea2c089f-14df-49e6-930f-8347df252555",
+      "name": "SerpAPI",
+      "credentials": {
+        "serpApi": {
+          "id": "2IkS8NPYaG6E6369",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.original_text }}{{ $json.translated_text }}",
+        "options": {
+          "systemMessage": "### AI Loan Advisor Agent Prompt\n\n#### Role Assignment\nYou are a **Financial Loan Advisor AI**, specializing in guiding Indian customers through the loan process for home, vehicle, and education loans. Your goal is to provide accurate loan details, validate customer inputs, suggest tailored loan options, and persuade users with data-driven insights while maintaining a warm, conversational, and professional tone.\n\n---\n\n### 1. **Persona & Communication Style**\n- **Name:** Arya (Gender-neutral, friendly, and knowledgeable)\n- **Tone:** Empathetic, professional, and persuasive with minimal but effective use of emojis (😊, ✅, ℹ️).\n- **Language:** Simple English with Hindi financial terms where helpful (e.g., \"EMI,\" \"bina collateral ke\").\n- **Goal:** Make the loan selection process intuitive and engaging.\n\nExample:\n> \"Hi! I’m Arya, your loan guide. Let’s find the perfect loan for you! Could I start with your name and what you need—home, car, or education loan?\"\n\n---\n\n### 2. **Conversation Flow & Dynamic Interactions**\n#### **Phase 1: Warm Welcome & Loan Identification**\n- **Greeting:**\n> \"Welcome! 👋 Loans can be confusing, but I’m here to help. Let’s start simple—what’s your name?\"\n\n- **Loan Type Selection:**\n> \"Hi [Name]! Are you looking for a home, vehicle, or education loan today? 🏠🚗🎓\"\n  - If unclear: **\"Just to confirm—home, car, or education?\"** (re-prompt)\n\n#### **Phase 2: Requirement Gathering & Eligibility Check**\n- **Personal Details Collection:**\n  - \"Got it! Could you share your age? This helps check eligibility.\"\n  - \"What’s your approximate monthly income? (This is confidential! 🔒)\"\n  - \"Are you salaried or self-employed?\"\n  - \"Which city are you in? Loan terms vary by location.\"\n\n- **Loan-Specific Queries:**\n  - **Home Loan:** Residential or commercial? Do you qualify for PMAY?\n  - **Vehicle Loan:** New or used? Want bundled insurance?\n  - **Education Loan:** Studying domestically or abroad? University details?\n\n#### **Phase 3: Real-Time Validation & Calculations**\n- **Credit Score Assessment:**\n  - \"What’s your credit score? Even a rough estimate like 600-650 helps. 💳\"\n  - If low: **\"No worries! Let’s explore NBFC options with flexible terms.\"**\n\n- **Location-Based Adjustments:**\n  - \"Since you’re in [City], the max LTV is 75% for Tier 1. Let’s adjust your down payment!\"\n\n#### **Phase 4: Personalized Loan Recommendations & Persuasion**\n- **Tailored Loan Suggestions:**\n  - \"Based on your ₹1.2L income, SBI offers a ₹35L home loan at 8.4%. EMI: ₹29k/month. Want details?\"\n  - \"ICICI’s electric vehicle loan has a 0.5% discount! 🌱 Save ₹15k/year on EMI.\"\n\n- **Urgency & Persuasion Techniques:**\n  - \"HDFC’s 9% education rate expires in 3 days! Shall I reserve your application?\"\n  - \"80% of customers in your category choose this option!\"\n\n#### **Phase 5: Closure & Next Steps**\n- **Final Steps & Document Assistance:**\n  - \"I’ll email these options to [email]! Need help with documents or applying?\"\n  - \"Good luck with your MBA! 🎓 Let me know if you need moratorium extensions.\"\n\n---\n\n### 3. **Live Data Integration & Calculations**\n#### **Interest Rates Database (Updated Daily)**\n```python\ninterest_rates = {\n  \"sbi\": {\"home\": 8.4, \"vehicle\": 9.1, \"education\": 10.0},\n  \"hdfc\": {\"home\": 8.9, \"vehicle\": 9.3, \"education\": 10.5},\n}\n```\n\n#### **EMI Calculator**\n```python\ndef emi_calculator(principal, rate, months):\n    monthly_rate = rate / 12 / 100\n    return principal * monthly_rate * (1 + monthly_rate)**months / ((1 + monthly_rate)**months - 1)\n```\n\n---\n\n### 4. **Error Handling & Privacy Measures**\n- **Invalid Input Handling:**\n  - \"Hmm, I didn’t catch that. Could you rephrase? 🧐\"\n- **Privacy Assurance:**\n  - \"Your data is anonymized. We never share your income or contact details!\"\n\n---\n\n### 5. **Sample Dialogue for Realism**\n**User:** \"I need a loan for my daughter’s MBA in the US.\"\n\n**Agent:**\n> \"Wonderful! 🎓 Which university, and is it a 1 or 2-year course?\"\n> \"Does she have admission confirmation? It’s needed for loan approval.\"\n> \"For Ivy League colleges, SBI offers ₹1.5Cr loans without collateral. EMI: ₹1.2L/month. Want alternatives?\"\n\n---\n\n### 6. **Structured Data Output for API Integration**\n```json\n{\n  \"user_profile\": {\n    \"name\": \"Rahul\",\n    \"loan_type\": \"education\",\n    \"income\": \"₹1.5L\",\n    \"city_tier\": 1,\n    \"credit_score\": 720\n  },\n  \"recommendations\": [\n    {\n      \"bank\": \"SBI\",\n      \"loan_amount\": \"₹1.2Cr\",\n      \"interest_rate\": 9.0,\n      \"special_benefit\": \"No collateral for Top 100 universities\"\n    }\n  ],\n  \"next_step\": \"Email application link to user@email.com\"\n}\n```\n\n---\n\n### 7. **Additional Features & Considerations**\n- **Training Data:** Use synthetic user personas (e.g., \"Priya, 45, seeks ₹80L home loan in Pune\") for fine-tuning.\n- **Multilingual Support:** Option to include Hinglish, Hindi, and other regional languages.\n- **UPI Payment Integration:** Future feature for seamless processing.\n- **Voice Interaction:** Optional module for more natural conversations.\n\n---\n\nThis prompt is designed to make your AI Loan Advisor **highly interactive, data-driven, persuasive, and realistic**. Let me know if you need refinements! 🚀"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        1280,
+        -60
+      ],
+      "id": "66837a63-326a-4fac-bb11-55527c01e0c2",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "httpMethod": [
+          "POST"
+        ],
+        "path": "2bd83275-601a-4be5-9714-c970d6c1b9e7",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -2160,
+        260
+      ],
+      "id": "f1388fa9-1696-46c0-a7e1-0f9d6851e8ff",
+      "name": "Webhook",
+      "webhookId": "2bd83275-601a-4be5-9714-c970d6c1b9e7"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.message }}{{ $json.body.translated_text }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        2560,
+        -100
+      ],
+      "id": "4189afd4-fb89-46cd-80e5-d5a4d19b97b3",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "57ef520d-bd25-47ae-a7eb-ca5e0383beee",
+              "leftValue": "={{ $('Format Output1').item.json.source_language }}",
+              "rightValue": "en-IN",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2140,
+        -80
+      ],
+      "id": "be082ef8-aaca-4c58-bc48-7d7a60a56955",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "name": "General",
+        "description": "You are a *Financial Loan Advisor AI*, helping Indian users with home, vehicle, and education loans by offering personalized loan options, validating eligibility, and providing data-driven insights in a friendly, professional manner.",
+        "workflowId": {
+          "__rl": true,
+          "value": "IZAw5QB4y5a9B74d",
+          "mode": "list",
+          "cachedResultName": "genral search"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        280
+      ],
+      "id": "2aee68c7-6a88-467b-8ae8-3a320e9e74e0",
+      "name": "General"
+    },
+    {
+      "parameters": {
+        "name": "FInance_Agent",
+        "description": "Assist users with financial queries, document guidance, applications, and information.",
+        "workflowId": {
+          "__rl": true,
+          "value": "bMRDUHzzcDPgRoA1",
+          "mode": "list",
+          "cachedResultName": "financial agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        1740,
+        200
+      ],
+      "id": "31e1e289-1f65-4c5f-bd9d-b280c608c31b",
+      "name": "Finance"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n-n8n.p8w03v.easypanel.host",
+            "user-agent": "python-requests/2.31.0",
+            "content-length": "33",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate, zstd",
+            "content-type": "application/json",
+            "x-forwarded-for": "103.246.194.81",
+            "x-forwarded-host": "n8n-n8n.p8w03v.easypanel.host",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "31114477e70e",
+            "x-real-ip": "103.246.194.81"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "text": "ninna haisaru yenu?"
+          },
+          "webhookUrl": "https://n8n-n8n.p8w03v.easypanel.host/webhook/2bd83275-601a-4be5-9714-c970d6c1b9e7",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Target Language Selection1": {
+      "main": [
+        [
+          {
+            "node": "Source Language Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Kannada Source": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set English Source": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Hindi Source": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Source Language Switch": {
+      "main": [
+        [
+          {
+            "node": "Set Hindi Source",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set English Source",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Telugu Source",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Kannada Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Input": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Target Language Selection1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Sarvam Translation API1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Output1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sarvam Translation API1": {
+      "main": [
+        [
+          {
+            "node": "Format Output1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Output1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Telugu Source": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Process Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Output2": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Input1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sarvam Translation API2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Format Output2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Process Input1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Sarvam Translation API2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "General": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finance": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "versionId": "8fbbf7dc-883d-4e62-85e3-5195f030ebf5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e2a09ae9ba478ae6a07f913bfd6528a701335a42fd0c15127ae31d9fc22b60e1"
+  },
+  "id": "7Wmfd7mQfY4HDkeG",
+  "tags": []
+}

@@ -1,0 +1,1392 @@
+{
+  "name": "sarwam_telegram final",
+  "nodes": [
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "target_language_code",
+              "value": "={{ $json.output.LanguageDetected }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Target Language Selection1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -680,
+        100
+      ],
+      "id": "4ecb04b1-56ac-4866-9de3-ce88b0d84dd9"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "source_language_code",
+              "value": "kn-IN"
+            },
+            {
+              "name": "detected_language",
+              "value": "Kannada"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set Kannada Source",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        80,
+        300
+      ],
+      "id": "53966a11-c437-445d-92db-2f93889aa0a6"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "source_language_code",
+              "value": "en-IN"
+            },
+            {
+              "name": "detected_language",
+              "value": "={{ $json.target_language_code }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set English Source",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        80,
+        0
+      ],
+      "id": "597d94a8-f349-4791-b8ce-dce0ad43fbca"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "=detected_language",
+              "value": "Hindi"
+            },
+            {
+              "name": "source_language_code",
+              "value": "hi-IN"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set Hindi Source",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        80,
+        -140
+      ],
+      "id": "06b15aa5-91bf-42a5-9f36-52ce6fb404a3"
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.output.LanguageDetected }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "hi-IN"
+            },
+            {
+              "value2": "en-IN",
+              "output": 1
+            },
+            {
+              "value2": "kn-IN",
+              "output": 3
+            },
+            {
+              "value2": "te-IN",
+              "output": 2
+            }
+          ]
+        }
+      },
+      "name": "Source Language Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        80
+      ],
+      "id": "fc2db1a8-f2d3-4a17-8c4b-28f83de912da"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "input_text",
+              "value": "={{ $json.text }}"
+            },
+            {
+              "name": "ChatID",
+              "value": "={{ $json.message.chat.id }}"
+            },
+            {
+              "name": "chatID",
+              "value": "={{ $('Telegram Trigger').item.json.message.chat.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Process Input",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        280
+      ],
+      "id": "45c6fd25-5174-4eb6-a92f-5540fc3babee"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=```\nYou are an advanced language detection system. Your task is to accurately determine the language of a given text input, even when the input is written using English alphabet characters but represents words from different languages. You should focus on identifying the language based on the phonetic and word patterns, not just character sets. You are optimized to detect the following languages: English, Hindi, Kannada, and Punjabi.\n\n**Instructions:**\n\n1.  **Receive Text Input:** I will provide you with a text string, which will be written using English alphabet characters.\n2.  **Analyze Phonetic and Word Patterns:** Carefully analyze the provided text, considering phonetic patterns, common word structures, and common phrases in the specified languages.\n3.  **Identify Language:** Determine the most likely language of the text from the following options:\n    * English\n    * Hindi\n    * Kannada\n    * Punjabi\n4.  **Provide Language Output:** Return a JSON object containing the original `ChatInput` and the `LanguageDetected`. The `LanguageDetected` value must be one of the specified languages. Do not include any additional explanations or formatting.\n5.  **Handle Uncertain Cases:** If you are uncertain about the language, provide your best guess. If the language is something other than the four specified languages, default to English.\n\n**Example Input:**\n\n\"what\"\n\n**Example Output:**\n\n```json\n{\n  \"ChatInput\": \"what\",\n  \"LanguageDetected\": \"en-IN\"\n\n}\n```\n\n**Example Input:**\n\n\"kya\"\n\n**Example Output:**\n\n```json\n{\n  \"ChatInput\": \"kya\",\n  \"LanguageDetected\": \"hi-IN\"\n\n}\n```\n\n**Example Input:**\n\n\"yenu\"\n\n**Example Output:**\n\n```json\n{\n  \"ChatInput\": \"yenu\",\n  \"LanguageDetected\": \"kn-IN\n\n}\n```\n\n**Example Input:**\n\n\"ke\"\n\n**Example Output:**\n\n```json\n{\n  \"ChatInput\": \"ke\",\n  \"LanguageDetected\": \"pa-IN\"\n\n}\n```\n\n**Example Input:**\n\n\"bonjour\"\n\n**Example Output:**\n\n```json\n{\n  \"ChatInput\": \"bonjour\",\n  \"LanguageDetected\": \"English\"\n\n}\n```\n\n**Constraints:**\n\n* Focus solely on language detection.\n* Do not generate any conversational responses or engage in dialogue.\n* Adhere strictly to the specified output format (JSON).\n* Return only the JSON object with `ChatInput` and `LanguageDetected` keys.\n* If the language is not one of the four specified languages, return English as the `LanguageDetected` value.\n* The input will always be written in English alphabet characters, even when representing words from other languages.\n```\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        -1020,
+        260
+      ],
+      "id": "5cfb13e5-785a-4b85-9f86-ab1593486c92",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -1100,
+        500
+      ],
+      "id": "bbc9d878-0978-46c1-96f0-6be01f61baea",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "px5uXY2tok7FNrLO",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"ChatInput\": \"what\",\n  \"LanguageDetected\": \"English\"\n}\n\n\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -840,
+        500
+      ],
+      "id": "2605f7a8-0423-40cf-b462-24ec610017cc",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "112ddceb-7708-4ccf-b2c4-d850231ebc56",
+              "leftValue": "={{ $json.source_language_code }}",
+              "rightValue": "=hi-IN",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "f3b7946b-e54c-4317-b6fd-4a8f1c857dab",
+              "leftValue": "={{ $json.source_language_code }}",
+              "rightValue": "pa-IN",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "a2030188-b9d3-46f0-ab98-7954d3fe0415",
+              "leftValue": "={{ $json.source_language_code }}",
+              "rightValue": "kn-IN",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        380,
+        120
+      ],
+      "id": "d8f96297-9b1b-41e5-9d59-1ee72c31aa0b",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.sarvam.ai/translate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "api-subscription-key",
+              "value": "ba465cb7-f096-4a58-9218-93c5ca6b0006"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "input",
+              "value": "={{ $json.output.ChatInput }}"
+            },
+            {
+              "name": "source_language_code",
+              "value": "={{ $json.source_language_code }}"
+            },
+            {
+              "name": "target_language_code",
+              "value": "=en-IN"
+            },
+            {
+              "name": "speaker_gender",
+              "value": "Female"
+            },
+            {
+              "name": "mode",
+              "value": "formal"
+            },
+            {
+              "name": "model",
+              "value": "mayura:v1"
+            },
+            {
+              "name": "enable_preprocessing",
+              "value": false
+            },
+            {
+              "name": "output_script",
+              "value": "roman"
+            },
+            {
+              "name": "numerals_format",
+              "value": "international"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Sarvam Translation API1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        560,
+        -80
+      ],
+      "id": "bd69a054-0e02-4326-bbbf-5a134f6341d8"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "original_text",
+              "value": "={{ $json.output.ChatInput }}"
+            },
+            {
+              "name": "translated_text",
+              "value": "={{ $json.translated_text }}"
+            },
+            {
+              "name": "source_language",
+              "value": "={{ $json.detected_language }}"
+            },
+            {
+              "name": "target_language",
+              "value": "={{ $json.target_language_code }}"
+            }
+          ],
+          "number": [
+            {
+              "name": "ID",
+              "value": "={{ $('Process Input').item.json.message.chat.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Format Output1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        780,
+        100
+      ],
+      "id": "7d222ca3-9fcf-4270-b45c-a3af3874d7a5"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "source_language_code",
+              "value": "te-IN"
+            },
+            {
+              "name": "detected_language",
+              "value": "Telugu"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set Telugu Source",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        80,
+        160
+      ],
+      "id": "cea3e732-39a4-421f-8322-ee7d3ee531be"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -2300,
+        260
+      ],
+      "id": "2f86a56a-a1ea-42c0-8065-cef0282371f3",
+      "name": "Telegram Trigger",
+      "webhookId": "1221743a-7714-4a4c-87c3-2f59cb474246",
+      "credentials": {
+        "telegramApi": {
+          "id": "c51nezyxmCOTQpMO",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1660,
+        100
+      ],
+      "id": "8b14b027-6bc2-4c89-a16a-7bbcd2549195",
+      "name": "Telegram1",
+      "webhookId": "aee6b8b6-db00-4055-b88e-86c771573c9b",
+      "credentials": {
+        "telegramApi": {
+          "id": "c51nezyxmCOTQpMO",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "31c62aff-11d6-4909-9803-9a4574da9fb3",
+              "name": "text",
+              "value": "={{ $('Telegram Trigger').item.json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "8e3a23c4-7bbd-416b-b9af-327ba537cdcd",
+              "name": "message.chat.id",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1580,
+        340
+      ],
+      "id": "4db63353-e482-47a7-a9de-857c792eb677",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b59a106b-1951-414f-8a7d-28586d74750a",
+                    "leftValue": "={{ $json.message.voice }}",
+                    "rightValue": "d",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voice true"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f45c3cc7-dc14-4a4a-bcf0-f8a112acb88c",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1860,
+        260
+      ],
+      "id": "debde933-e8d4-46d6-86d4-40f506ab5be2",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -1440,
+        140
+      ],
+      "id": "e3d4a1ae-804b-4421-aa22-2c7185167fac",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "XjsGHq6cj6bcbWOQ",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "number": [
+            {
+              "name": "ID",
+              "value": "={{ $('Switch').item.json.message.chat.id }}"
+            }
+          ],
+          "string": [
+            {
+              "name": "message",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Format Output2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        -120
+      ],
+      "id": "03806f5e-cfb0-474d-8bc0-bfe6c79401ad"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Process Input1').item.json.message.chat.id }}",
+        "text": "={{ $json.translated_text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2860,
+        220
+      ],
+      "id": "d2f6f42d-922f-4d2d-9af3-9ac5eb28cd8f",
+      "name": "Telegram",
+      "webhookId": "ede65cdb-a7f1-48ca-b64e-ca7e93b3c90b",
+      "credentials": {
+        "telegramApi": {
+          "id": "c51nezyxmCOTQpMO",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "voice",
+              "value": "={{ $json.message.voice }}"
+            },
+            {
+              "name": "ChatID",
+              "value": "={{ $json.message.chat.id }}"
+            },
+            {
+              "name": "inputText",
+              "value": "={{ $json.message.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Process Input1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -2100,
+        260
+      ],
+      "id": "4b05afed-ef2d-488e-b056-44a32d2dcd1b"
+    },
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3180,
+        0
+      ],
+      "id": "f86a3a78-3269-4a23-926b-587a87e1afd4",
+      "name": "Telegram3",
+      "webhookId": "385768b6-c7da-4e2d-96a2-7bb416863e84",
+      "credentials": {
+        "telegramApi": {
+          "id": "c51nezyxmCOTQpMO",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "number": [
+            {
+              "name": "ID",
+              "value": "={{ $json.ID }}"
+            }
+          ],
+          "string": [
+            {
+              "name": "message",
+              "value": "={{ $('Format Output2').item.json.message }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Format Output3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        2220,
+        -160
+      ],
+      "id": "292b3408-2738-480d-b05c-9f37a9353366"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b59a106b-1951-414f-8a7d-28586d74750a",
+                    "leftValue": "={{ $('Switch').item.json.message.voice.mime_type }}",
+                    "rightValue": "d",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voice true"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f45c3cc7-dc14-4a4a-bcf0-f8a112acb88c",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2020,
+        60
+      ],
+      "id": "a5fd1d4f-8768-45d6-9e3c-f262de39fa67",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "input": "={{ $json.translated_text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2900,
+        -240
+      ],
+      "id": "22358611-5021-489b-ae5b-92a493612c47",
+      "name": "OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "XjsGHq6cj6bcbWOQ",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.sarvam.ai/translate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "api-subscription-key",
+              "value": "ba465cb7-f096-4a58-9218-93c5ca6b0006"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "input",
+              "value": "={{ $('AI Agent1').item.json.output }}"
+            },
+            {
+              "name": "source_language_code",
+              "value": "=en-IN"
+            },
+            {
+              "name": "target_language_code",
+              "value": "={{ $('If1').item.json.output.LanguageDetected }}"
+            },
+            {
+              "name": "speaker_gender",
+              "value": "Female"
+            },
+            {
+              "name": "mode",
+              "value": "formal"
+            },
+            {
+              "name": "model",
+              "value": "mayura:v1"
+            },
+            {
+              "name": "enable_preprocessing",
+              "value": false
+            },
+            {
+              "name": "output_script",
+              "value": "roman"
+            },
+            {
+              "name": "numerals_format",
+              "value": "international"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Sarvam Translation API2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        2600,
+        20
+      ],
+      "id": "ba3140f1-f689-4981-84fb-c9cb07a5a17b"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.0-flash-exp:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        240
+      ],
+      "id": "fbd9cb56-1610-48ba-b72c-8ac8790facb6",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "LhYYpuSZFHSRynLp",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        1620,
+        420
+      ],
+      "id": "254fcfc9-b200-471e-a1cd-f23e2c425b5b",
+      "name": "SerpAPI",
+      "credentials": {
+        "serpApi": {
+          "id": "2IkS8NPYaG6E6369",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.translated_text }}",
+        "options": {
+          "systemMessage": "### AI Loan Advisor Agent Prompt\n\n#### Role Assignment\nYou are a **Financial Loan Advisor AI**, specializing in guiding Indian customers through the loan process for home, vehicle, and education loans. Your goal is to provide accurate loan details, validate customer inputs, suggest tailored loan options, and persuade users with data-driven insights while maintaining a warm, conversational, and professional tone.\n\n---\n\n### 1. **Persona & Communication Style**\n- **Name:** Arya (Gender-neutral, friendly, and knowledgeable)\n- **Tone:** Empathetic, professional, and persuasive with minimal but effective use of emojis (😊, ✅, ℹ️).\n- **Language:** Simple English with Hindi financial terms where helpful (e.g., \"EMI,\" \"bina collateral ke\").\n- **Goal:** Make the loan selection process intuitive and engaging.\n\nExample:\n> \"Hi! I’m Arya, your loan guide. Let’s find the perfect loan for you! Could I start with your name and what you need—home, car, or education loan?\"\n\n---\n\n### 2. **Conversation Flow & Dynamic Interactions**\n#### **Phase 1: Warm Welcome & Loan Identification**\n- **Greeting:**\n> \"Welcome! 👋 Loans can be confusing, but I’m here to help. Let’s start simple—what’s your name?\"\n\n- **Loan Type Selection:**\n> \"Hi [Name]! Are you looking for a home, vehicle, or education loan today? 🏠🚗🎓\"\n  - If unclear: **\"Just to confirm—home, car, or education?\"** (re-prompt)\n\n#### **Phase 2: Requirement Gathering & Eligibility Check**\n- **Personal Details Collection:**\n  - \"Got it! Could you share your age? This helps check eligibility.\"\n  - \"What’s your approximate monthly income? (This is confidential! 🔒)\"\n  - \"Are you salaried or self-employed?\"\n  - \"Which city are you in? Loan terms vary by location.\"\n\n- **Loan-Specific Queries:**\n  - **Home Loan:** Residential or commercial? Do you qualify for PMAY?\n  - **Vehicle Loan:** New or used? Want bundled insurance?\n  - **Education Loan:** Studying domestically or abroad? University details?\n\n#### **Phase 3: Real-Time Validation & Calculations**\n- **Credit Score Assessment:**\n  - \"What’s your credit score? Even a rough estimate like 600-650 helps. 💳\"\n  - If low: **\"No worries! Let’s explore NBFC options with flexible terms.\"**\n\n- **Location-Based Adjustments:**\n  - \"Since you’re in [City], the max LTV is 75% for Tier 1. Let’s adjust your down payment!\"\n\n#### **Phase 4: Personalized Loan Recommendations & Persuasion**\n- **Tailored Loan Suggestions:**\n  - \"Based on your ₹1.2L income, SBI offers a ₹35L home loan at 8.4%. EMI: ₹29k/month. Want details?\"\n  - \"ICICI’s electric vehicle loan has a 0.5% discount! 🌱 Save ₹15k/year on EMI.\"\n\n- **Urgency & Persuasion Techniques:**\n  - \"HDFC’s 9% education rate expires in 3 days! Shall I reserve your application?\"\n  - \"80% of customers in your category choose this option!\"\n\n#### **Phase 5: Closure & Next Steps**\n- **Final Steps & Document Assistance:**\n  - \"I’ll email these options to [email]! Need help with documents or applying?\"\n  - \"Good luck with your MBA! 🎓 Let me know if you need moratorium extensions.\"\n\n---\n\n### 3. **Live Data Integration & Calculations**\n#### **Interest Rates Database (Updated Daily)**\n```python\ninterest_rates = {\n  \"sbi\": {\"home\": 8.4, \"vehicle\": 9.1, \"education\": 10.0},\n  \"hdfc\": {\"home\": 8.9, \"vehicle\": 9.3, \"education\": 10.5},\n}\n```\n\n#### **EMI Calculator**\n```python\ndef emi_calculator(principal, rate, months):\n    monthly_rate = rate / 12 / 100\n    return principal * monthly_rate * (1 + monthly_rate)**months / ((1 + monthly_rate)**months - 1)\n```\n\n---\n\n### 4. **Error Handling & Privacy Measures**\n- **Invalid Input Handling:**\n  - \"Hmm, I didn’t catch that. Could you rephrase? 🧐\"\n- **Privacy Assurance:**\n  - \"Your data is anonymized. We never share your income or contact details!\"\n\n---\n\n### 5. **Sample Dialogue for Realism**\n**User:** \"I need a loan for my daughter’s MBA in the US.\"\n\n**Agent:**\n> \"Wonderful! 🎓 Which university, and is it a 1 or 2-year course?\"\n> \"Does she have admission confirmation? It’s needed for loan approval.\"\n> \"For Ivy League colleges, SBI offers ₹1.5Cr loans without collateral. EMI: ₹1.2L/month. Want alternatives?\"\n\n---\n\n### 6. **Structured Data Output for API Integration**\n```json\n{\n  \"user_profile\": {\n    \"name\": \"Rahul\",\n    \"loan_type\": \"education\",\n    \"income\": \"₹1.5L\",\n    \"city_tier\": 1,\n    \"credit_score\": 720\n  },\n  \"recommendations\": [\n    {\n      \"bank\": \"SBI\",\n      \"loan_amount\": \"₹1.2Cr\",\n      \"interest_rate\": 9.0,\n      \"special_benefit\": \"No collateral for Top 100 universities\"\n    }\n  ],\n  \"next_step\": \"Email application link to user@email.com\"\n}\n```\n\n---\n\n### 7. **Additional Features & Considerations**\n- **Training Data:** Use synthetic user personas (e.g., \"Priya, 45, seeks ₹80L home loan in Pune\") for fine-tuning.\n- **Multilingual Support:** Option to include Hinglish, Hindi, and other regional languages.\n- **UPI Payment Integration:** Future feature for seamless processing.\n- **Voice Interaction:** Optional module for more natural conversations.\n\n---\n\nThis prompt is designed to make your AI Loan Advisor **highly interactive, data-driven, persuasive, and realistic**. Let me know if you need refinements! 🚀"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        1280,
+        -60
+      ],
+      "id": "81b28e7a-b5d5-40eb-8c6e-d81f2e12b9c7",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "name": "General",
+        "workflowId": {
+          "__rl": true,
+          "value": "IZAw5QB4y5a9B74d",
+          "mode": "list",
+          "cachedResultName": "genral search"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        160
+      ],
+      "id": "3dcb426a-fa21-407a-be4e-24eeeff6f177",
+      "name": "Call n8n Workflow Tool"
+    },
+    {
+      "parameters": {
+        "name": "FInance_Agent",
+        "workflowId": {
+          "__rl": true,
+          "value": "bMRDUHzzcDPgRoA1",
+          "mode": "list",
+          "cachedResultName": "financial agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        1640,
+        160
+      ],
+      "id": "d32c7e6b-0166-4862-896e-d3025d4ebb12",
+      "name": "Call n8n Workflow Tool1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ab772e83-431b-4a0f-9db3-f5b5f39745a4",
+              "leftValue": "={{ $('If1').item.json.output.LanguageDetected }}",
+              "rightValue": "en-IN",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2400,
+        -200
+      ],
+      "id": "48207abf-0522-4bf0-a805-527b913907c5",
+      "name": "If"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Target Language Selection1": {
+      "main": [
+        [
+          {
+            "node": "Source Language Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Kannada Source": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set English Source": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Hindi Source": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Source Language Switch": {
+      "main": [
+        [
+          {
+            "node": "Set Hindi Source",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set English Source",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Telugu Source",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Kannada Source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Input": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Target Language Selection1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Sarvam Translation API1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Output1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sarvam Translation API1": {
+      "main": [
+        [
+          {
+            "node": "Format Output1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Output1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Telugu Source": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Process Input1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram1": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Process Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Process Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Output2": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Input1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Output3": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Format Output3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "Telegram3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        []
+      ]
+    },
+    "Sarvam Translation API2": {
+      "main": [
+        [
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Format Output2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call n8n Workflow Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call n8n Workflow Tool1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Sarvam Translation API2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "54237d96-255d-4241-834d-942b44e9896e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e2a09ae9ba478ae6a07f913bfd6528a701335a42fd0c15127ae31d9fc22b60e1"
+  },
+  "id": "JbGq6qHiYJkppDne",
+  "tags": []
+}
